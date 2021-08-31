@@ -2,7 +2,7 @@
     include 'conn.php';
     session_start();
 
-    // To display message
+    // To display message from user
 
     if ($_SESSION['message']){
         echo $_SESSION['message'];

@@ -210,41 +210,23 @@
     <div class="row d-flex justify-content-center text-center">
         <h2 class="my-4">Address</h2>
         <form method="POST">
-            <select>
-                <option>SELECT</option>
+            <select onchange="country(this.value)">
+                <option>Country</option>
                 <?php
                     $res = mysqli_query($con,'select * from countries;');
                     while($row = mysqli_fetch_array($res))
                     {
-                        ?>
-                <option><?php echo $row['name']; ?></option>
+                 ?>
+                        <option><?php echo $row['name']; ?></option>
                 <?php
                     }
                     ?>
             </select>
-            <select>
-                <option>SELECT</option>
-                <?php
-                    $res = mysqli_query($con,'select * from states where country_id = 101;');
-                    while($row = mysqli_fetch_array($res))
-                    {
-                        ?>
-                <option><?php echo $row['name']; ?></option>
-                <?php
-                    }
-                    ?>
+            <select id="state" onchange="findState(this.value)">
+                <option>State</option>
             </select>
-            <select>
-                <option>SELECT</option>
-                <?php
-                    $res = mysqli_query($con,'select * from cities where state_id = 21;');
-                    while($row = mysqli_fetch_array($res))
-                    {
-                        ?>
-                <option><?php echo $row['name']; ?></option>
-                <?php
-                    }
-                    ?>
+            <select id="city">
+                <option>City</option>
             </select>
             <button type="submit" name="address" class="btn btn-primary">Submit</button>
         </form>
@@ -266,5 +248,28 @@
         </div>
     </div>
 </body>
+<script>
+    function country(data){
+        const ajaxreq = new XMLHttpRequest();
+        ajaxreq.open('GET','http://localhost/Agnito-PHP-task1/getdata.php?country='+data,'TRUE');
+        ajaxreq.send();
 
+        ajaxreq.onreadystatechange = function(){
+            if(ajaxreq.readyState == 4 && ajaxreq.status == 200){
+                document.getElementById('state').innerHTML=ajaxreq.responseText;
+            }   
+        }
+    }
+    function findState(data){
+        const ajaxreq = new XMLHttpRequest();
+        ajaxreq.open('GET','http://localhost/Agnito-PHP-task1/getdata.php?state='+data,'TRUE');
+        ajaxreq.send();
+
+        ajaxreq.onreadystatechange = function(){
+            if(ajaxreq.readyState == 4 && ajaxreq.status == 200){
+                document.getElementById('city').innerHTML = ajaxreq.responseText;
+            }
+        }
+    }
+</script>
 </html>

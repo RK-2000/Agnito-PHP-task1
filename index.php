@@ -136,7 +136,17 @@
     $query = mysqli_query($con,$q) or trigger_error(mysqli_error($con));
     $result = mysqli_fetch_assoc($query);
     $img=$result['img'];
+    if ($result['address']){
+        $address = explode(", ",$result['address']);
+    
+        $country=$address[2];
+        $state=$address[1];
+        $city=$address[0];
+    }
+    
 
+
+    
 
     // To delete user from database permanently
     if (isset($_POST['delete'])){
@@ -226,6 +236,15 @@
     <!-- Address -->
     <div class="row d-flex justify-content-center text-left">
         <h2 class="my-4">Address</h2>
+        <?php
+        if ($address and $city and $state){
+            echo "<div>
+            <p>City: ".$city."</p>
+            <p>State: ".$state."</p>
+            <p>Country: ".$country."</p>
+            </div>";
+        }
+        ?>
         <form method="POST">
             <div>
                 Country:

@@ -149,7 +149,23 @@
             unset($_SESSION['password']);
             header('Location:login.php');
         }
-        
+    }
+
+    // To save address
+    if (isset($_POST['address'])){
+        $country = $_POST['country'];
+        $state = $_POST['state'];
+        $city = $_POST['city'];
+        $address = "$city, $state, $country";
+        $q="update user set address='$address' where username='$username' and password='$password';";
+        $query=mysqli_query($con,$q) or trigger_error($con);
+        if ($query){
+            $_SESSION['message'] = "Address updated";
+        }
+        else{
+            $_SESSION['message'] = "$q";
+        }
+        header('Location:index.php');
     }
 ?>
 <!DOCTYPE html>
@@ -207,28 +223,38 @@
         </div>
     </div>
     <hr />
-    <div class="row d-flex justify-content-center text-center">
+    <!-- Address -->
+    <div class="row d-flex justify-content-center text-left">
         <h2 class="my-4">Address</h2>
         <form method="POST">
-            <select onchange="country(this.value)">
-                <option>Country</option>
-                <?php
+            <div>
+                Country:
+                <select class="mt-2" onchange="findCountry(this.value)" name="country">
+                    <option>Country</option>
+                    <?php
                     $res = mysqli_query($con,'select * from countries;');
                     while($row = mysqli_fetch_array($res))
                     {
                  ?>
-                        <option><?php echo $row['name']; ?></option>
-                <?php
+                    <option><?php echo $row['name']; ?></option>
+                    <?php
                     }
                     ?>
-            </select>
-            <select id="state" onchange="findState(this.value)">
-                <option>State</option>
-            </select>
-            <select id="city">
-                <option>City</option>
-            </select>
-            <button type="submit" name="address" class="btn btn-primary">Submit</button>
+                </select>
+            </div>
+            <div>
+                State
+                <select class="mt-2" id="state" onchange="findState(this.value)" name="state">
+                    <option>State</option>
+                </select>
+            </div>
+            <div>
+                City
+                <select id="city" name="city" class="mt-2">
+                    <option>City</option>
+                </select>
+            </div>
+            <button type="submit" name="address" class="btn btn-primary mt-2">Submit</button>
         </form>
     </div>
 
@@ -249,27 +275,29 @@
     </div>
 </body>
 <script>
-    function country(data){
-        const ajaxreq = new XMLHttpRequest();
-        ajaxreq.open('GET','http://localhost/Agnito-PHP-task1/getdata.php?country='+data,'TRUE');
-        ajaxreq.send();
+function findCountry(data) {
+    const ajaxreq = new XMLHttpRequest();
+    ajaxreq.open('GET', 'http://localhost/test/getdata.php?country=' + data, 'TRUE');
+    ajaxreq.send();
 
-        ajaxreq.onreadystatechange = function(){
-            if(ajaxreq.readyState == 4 && ajaxreq.status == 200){
-                document.getElementById('state').innerHTML=ajaxreq.responseText;
-            }   
+    ajaxreq.onreadystatechange = function() {
+        if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
+            document.getElementById('state').innerHTML = ajaxreq.responseText;
         }
     }
-    function findState(data){
-        const ajaxreq = new XMLHttpRequest();
-        ajaxreq.open('GET','http://localhost/Agnito-PHP-task1/getdata.php?state='+data,'TRUE');
-        ajaxreq.send();
+}
 
-        ajaxreq.onreadystatechange = function(){
-            if(ajaxreq.readyState == 4 && ajaxreq.status == 200){
-                document.getElementById('city').innerHTML = ajaxreq.responseText;
-            }
+function findState(data) {
+    const ajaxreq = new XMLHttpRequest();
+    ajaxreq.open('GET', 'http://localhost/test/getdata.php?state=' + data, 'TRUE');
+    ajaxreq.send();
+
+    ajaxreq.onreadystatechange = function() {
+        if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
+            document.getElementById('city').innerHTML = ajaxreq.responseText;
         }
     }
+}
 </script>
+
 </html>

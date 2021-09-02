@@ -1,4 +1,3 @@
-
 <?php
 include 'conn.php';
 if (isset($_GET['country'])){
@@ -9,7 +8,7 @@ if (isset($_GET['country'])){
 
     while($row = mysqli_fetch_array($res))
                         {
-                            echo "<option value=".$row['name'].">".$row['name']."</option>";
+                            echo "<option>".$row['name']."</option>";
                         }
 
 }
@@ -20,7 +19,7 @@ if (isset($_GET['state'])){
     $res = mysqli_query($con,"select * from cities where state_id = '$id';");
     while($row = mysqli_fetch_array($res))
                         {
-                            echo "<option value=".$row['name'].">".$row['name']."</option>";
+                            echo "<option>".$row['name']."</option>";
                         }
     
 }

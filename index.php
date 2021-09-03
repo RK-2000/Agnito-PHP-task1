@@ -190,6 +190,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous">
     </script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrLy7nCsS320eaconYpHIB1TvGTfu_qyc&callback=initMap">
+    </script>
+
     <title>CRUD : Home</title>
     <style>
     #profile {
@@ -199,6 +205,21 @@
         height: auto;
     }
     </style>
+    <style>
+    #map {
+        height: 500px;
+        width: 90vw;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+
+
 </head>
 
 <body class="container">
@@ -245,7 +266,7 @@
             </div>";
         }
         ?>
-        <form method="POST">
+        <form method="POST" class="col-12 col-md-4">
             <div>
                 Country:
                 <select class="mt-2" onchange="findCountry(this.value)" name="country">
@@ -276,7 +297,12 @@
             <button type="submit" name="address" class="btn btn-primary mt-2">Submit</button>
         </form>
     </div>
+    <div class="col-12 col-md-8">
 
+        <div id="map">
+
+        </div>
+    </div>
     <hr />
     <div class="row text-center mt-4">
 
@@ -292,31 +318,98 @@
             </form>
         </div>
     </div>
+    <script>
+    function callTwoFunction() {
+        getCurrentLocation();
+        initMap();
+    }
+
+    function findCountry(data) {
+        const ajaxreq = new XMLHttpRequest();
+        ajaxreq.open('GET', 'http://localhost/test/getdata.php?country=' + data, 'TRUE');
+        ajaxreq.send();
+
+        ajaxreq.onreadystatechange = function() {
+            if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
+                document.getElementById('state').innerHTML = ajaxreq.responseText;
+            }
+        }
+    }
+
+    function findState(data) {
+        const ajaxreq = new XMLHttpRequest();
+        ajaxreq.open('GET', 'http://localhost/test/getdata.php?state=' + data, 'TRUE');
+        ajaxreq.send();
+
+        ajaxreq.onreadystatechange = function() {
+            if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
+                document.getElementById('city').innerHTML = ajaxreq.responseText;
+            }
+        }
+    }
+    var x = document.getElementById('current_location');
+
+    function getCurrentLocation() {
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            alert('Your browser does not support Geolocation');
+        }
+    }
+    var lat = 33.8121;
+    var long = -117.9190;
+
+    function showPosition(position) {
+        lat = position.coords.latitude;
+        long = position.coords.longitude;
+    }
+
+    let map, infoWindow;
+    var geocoder;
+
+    function initMap() {
+        geocoder = new google.maps.Geocoder();
+
+        map = new google.maps.Map(document.getElementById("map"), {
+
+            center: {
+                lat: lat,
+                lng: long
+            },
+            zoom: 10,
+        });
+
+        infoWindow = new google.maps.InfoWindow();
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "Pan to Current Location";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+        locationButton.addEventListener("click", () => {
+            // Try HTML5 geolocation.
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        infoWindow.setPosition(pos);
+                        infoWindow.setContent("Location found.");
+                        infoWindow.open(map);
+                        map.setCenter(pos);
+                    },
+                    () => {
+                        handleLocationError(true, infoWindow, map.getCenter());
+                    }
+                );
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        });
+    }
+    </script>
 </body>
-<script>
-function findCountry(data) {
-    const ajaxreq = new XMLHttpRequest();
-    ajaxreq.open('GET', 'http://localhost/test/getdata.php?country=' + data, 'TRUE');
-    ajaxreq.send();
-
-    ajaxreq.onreadystatechange = function() {
-        if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
-            document.getElementById('state').innerHTML = ajaxreq.responseText;
-        }
-    }
-}
-
-function findState(data) {
-    const ajaxreq = new XMLHttpRequest();
-    ajaxreq.open('GET', 'http://localhost/test/getdata.php?state=' + data, 'TRUE');
-    ajaxreq.send();
-
-    ajaxreq.onreadystatechange = function() {
-        if (ajaxreq.readyState == 4 && ajaxreq.status == 200) {
-            document.getElementById('city').innerHTML = ajaxreq.responseText;
-        }
-    }
-}
-</script>
 
 </html>
